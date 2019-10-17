@@ -24,4 +24,10 @@ func main() {
 		}
 		fmt.Println("")
 	}
+
+	// 对号的 Unicode 代码
+	CheckSymbol := "\u2714 "
+	// 叉号的 Unicode 代码
+	CrossSymbol := "\u2716 "
+	fmt.Println(CheckSymbol, CrossSymbol)
 }
