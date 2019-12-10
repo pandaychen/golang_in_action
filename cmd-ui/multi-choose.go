@@ -7,10 +7,14 @@ import (
 )
 
 func main() {
+	var lable_big  []string
+	for i:=0;i<10000;i++{
+		lable_big=append(lable_big,"abcedfghijklmnopqrstuvwxyz,abcedfghijklmnopqrstuvwxyz,abcedfghijklmnopqrstuvwxyz,abcedfghijklmnopqrstuvwxyz"+strconv.Itoa(i))
+	}
 	prompt := promptui.Select{
 		Label: "Select Day",
-		Items: []string{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
-			"Saturday", "Sunday"},
+		Items: lable_big,
+		
 	}
 
 	_, result, err := prompt.Run()

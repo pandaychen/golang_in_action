@@ -1,7 +1,10 @@
 package main
+
 import (
 	"encoding/binary"
 	"fmt"
+	"github.com/kr/pty"
+	"golang.org/x/crypto/ssh"
 	"io"
 	"io/ioutil"
 	"log"
@@ -10,9 +13,8 @@ import (
 	"sync"
 	"syscall"
 	"unsafe"
-	"github.com/kr/pty"
-	"golang.org/x/crypto/ssh"
 )
+
 func main() {
 	// In the latest version of crypto/ssh (after Go 1.3), the SSH server type has been removed
 	// in favour of an SSH connection type. A ssh.ServerConn is created by passing an existing
@@ -32,9 +34,10 @@ func main() {
 		// NoClientAuth: true,
 	}
 	// You can generate a keypair with 'ssh-keygen -t rsa'
-	privateBytes, err := ioutil.ReadFile("id_rsa")
+	privateBytes, err := ioutil.ReadFile("/root/.ssh/id_rsa")
 	if err != nil {
-		log.Fatal("Failed to load private key (./id_rsa)")
+		fmt.Println(err)
+		log.Fatal("Failed to load private key (~/.ssh/id_rsa)")
 	}
 	private, err := ssh.ParsePrivateKey(privateBytes)
 	if err != nil {
@@ -42,12 +45,11 @@ func main() {
 	}
 	config.AddHostKey(private)
 	// Once a ServerConfig has been configured, connections can be accepted.
-	listener, err := net.Listen("tcp", "127.0.0.1:2200")
+	listener, err := net.Listen("tcp", "127.0.0.1:2222")
 	if err != nil {
-		log.Fatalf("Failed to listen on 2200 (%s)", err)
+		log.Fatalf("Failed to listen on 2222 (%s)", err)
 	}
 	// Accept all connections
-	log.Print("Listening on 2200...")
 	for {
 		tcpConn, err := listener.Accept()
 		if err != nil {
@@ -142,12 +144,14 @@ func handleChannel(newChannel ssh.NewChannel) {
 		}
 	}()
 }
+
 // parseDims extracts terminal dimensions (width x height) from the provided buffer.
 func parseDims(b []byte) (uint32, uint32) {
 	w := binary.BigEndian.Uint32(b)
 	h := binary.BigEndian.Uint32(b[4:])
 	return w, h
 }
+
 // Winsize stores the Height and Width of a terminal.
 type Winsize struct {
 	Height uint16
@@ -155,6 +159,7 @@ type Winsize struct {
 	x      uint16 // unused
 	y      uint16 // unused
 }
+
 // SetWinsize sets the size of the given pty.
 func SetWinsize(fd uintptr, w, h uint32) {
 	ws := &Winsize{Width: uint16(w), Height: uint16(h)}
