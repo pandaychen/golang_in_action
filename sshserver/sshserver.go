@@ -29,6 +29,9 @@ func main() {
 			}
 			return nil, fmt.Errorf("password rejected for %q", c.User())
 		},
+		PublicKeyCallback: func(conn ssh.ConnMetadata, key ssh.PublicKey) (*ssh.Permissions, error) {
+			return nil, fmt.Errorf("Unknown public key\n")
+		},
 		// You may also explicitly allow anonymous client authentication, though anon bash
 		// sessions may not be a wise idea
 		// NoClientAuth: true,
