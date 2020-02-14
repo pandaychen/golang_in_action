@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"github.com/kr/pty"
 	"golang.org/x/crypto/ssh"
@@ -32,6 +33,25 @@ func main() {
 		PublicKeyCallback: func(conn ssh.ConnMetadata, key ssh.PublicKey) (*ssh.Permissions, error) {
 			return nil, fmt.Errorf("Unknown public key\n")
 		},
+		KeyboardInteractiveCallback: func(c ssh.ConnMetadata, challenge ssh.KeyboardInteractiveChallenge) (*ssh.Permissions, error) {
+			ans, err := challenge("root",
+				"",
+				[]string{"pin+token:"},
+				[]bool{true})
+			if err != nil {
+				return nil, err
+			}
+			fmt.Println(ans) //with ans,you got the user keyboard input
+			return nil, nil
+			ok := c.User() == "root"
+
+			if ok {
+				//challenge("user", "motd", nil, nil)
+				return nil, nil
+			}
+			return nil, errors.New("keyboard-interactive failed")
+		},
+
 		// You may also explicitly allow anonymous client authentication, though anon bash
 		// sessions may not be a wise idea
 		// NoClientAuth: true,
