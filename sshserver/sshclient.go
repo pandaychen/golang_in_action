@@ -5,10 +5,12 @@ package main
 
 import (
 	"fmt"
-	"golang.org/x/crypto/ssh"
-	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"os"
+	"time"
+
+	"golang.org/x/crypto/ssh"
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 func main() {
@@ -43,6 +45,13 @@ func main() {
 	defer terminal.Restore(termFD, termState)
 	err = session.RequestPty("xterm-256color", h, w, modes)
 	ce(err, "request pty")
+	go func() {
+		for {
+			time.Sleep(time.Second * time.Duration(30))
+			session.SendRequest("keepalive@openssh.com", true, nil)
+
+		}
+	}()
 	err = session.Shell()
 	ce(err, "start shell")
 	session.Wait()

@@ -4,8 +4,6 @@ import (
 	"encoding/binary"
 	"errors"
 	"fmt"
-	"github.com/kr/pty"
-	"golang.org/x/crypto/ssh"
 	"io"
 	"io/ioutil"
 	"log"
@@ -14,6 +12,9 @@ import (
 	"sync"
 	"syscall"
 	"unsafe"
+
+	"github.com/kr/pty"
+	"golang.org/x/crypto/ssh"
 )
 
 func main() {
@@ -163,6 +164,8 @@ func handleChannel(newChannel ssh.NewChannel) {
 			case "window-change":
 				w, h := parseDims(req.Payload)
 				SetWinsize(bashf.Fd(), w, h)
+			case "keepalive@openssh.com":
+				req.Reply(true, nil)
 			}
 		}
 	}()
