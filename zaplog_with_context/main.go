@@ -42,6 +42,7 @@ func TraceIdLog() gin.HandlerFunc {
 		}
 		ctx, log := xzap.GetCtxZapLoger().WithContextAndFields(c.Request.Context(), zap.Any("traceId", traceId))
 		c.Request = c.Request.WithContext(ctx)
+		//https://pkg.go.dev/net/http#Request.WithContext
 		log.Info("Set TraceIdLog done")
 		c.Next()
 	}
@@ -58,6 +59,6 @@ func main() {
 		log.Debug("test")
 		context.JSON(200, "success")
 	})
-	xzap.GetLoger().Info("hconf example success")
+	xzap.GetLoger().Info("start listening...")
 	http.ListenAndServe(":8888", g)
 }
