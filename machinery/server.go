@@ -29,12 +29,6 @@ func main() {
 		log.Println("reg task failed", err)
 		return
 	}
-	err = server.RegisterTask("call", CallBack)
-	if err != nil {
-		log.Println("reg task failed", err)
-		return
-	}
-
 	//task signature
 	signature1 := &tasks.Signature{
 		Name: "sum",
@@ -49,12 +43,16 @@ func main() {
 		RoutingKey:   "high_queue",
 	}
 
+	var array2 []int64 = make([]int64, 0, 10000)
+	for i := 0; i < 10000; i++ {
+		array2 = append(array2, int64(i))
+	}
 	signature2 := &tasks.Signature{
 		Name: "sum",
 		Args: []tasks.Arg{
 			{
 				Type:  "[]int64",
-				Value: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+				Value: array2,
 			},
 		},
 		RetryTimeout: 100,
@@ -62,12 +60,16 @@ func main() {
 		RoutingKey:   "high_queue",
 	}
 
+	var array3 []int64 = make([]int64, 0, 1000000)
+	for i := 0; i < 1000000; i++ {
+		array3 = append(array3, int64(i))
+	}
 	signature3 := &tasks.Signature{
 		Name: "sum",
 		Args: []tasks.Arg{
 			{
 				Type:  "[]int64",
-				Value: []int64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10},
+				Value: array3,
 			},
 		},
 		RetryTimeout: 100,
@@ -94,8 +96,7 @@ func main() {
 			continue
 		}
 		log.Printf(
-			"%v  %v \n",
-			asyncResult.Signature.Args[0].Value,
+			"%v  \n",
 			tasks.HumanReadableResults(results),
 		)
 	}
